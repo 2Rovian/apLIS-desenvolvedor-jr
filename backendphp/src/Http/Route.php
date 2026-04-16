@@ -14,6 +14,15 @@ class Route {
         self::$routes["POST"][rtrim($path, "/")] = $handler;
     }
 
+    public static function put(string $path, callable $handler): void {
+        self::$routes["PUT"][rtrim($path, "/")] = $handler;
+    }
+
+    public static function delete(string $path, callable $handler): void {
+        self::$routes["DELETE"][rtrim($path, "/")] = $handler;
+    }
+
+
     public static function dispatch(Request $request) {
         $method = $request->method;
         $path = $request->path;
