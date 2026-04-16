@@ -44,3 +44,22 @@ export async function registerPaciente(req, res) {
     }
 
 }
+
+export async function deletePacienteById(req, res) {
+    try {
+        const { id } = req.params;
+        const [result] = await db.query("DELETE FROM tb_pacientes WHERE id = ?", [id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Paciente não encontrado." });
+        }
+
+        return res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            status: 500,
+            message: "Erro ao deletar paciente",
+        })
+    }
+} 
