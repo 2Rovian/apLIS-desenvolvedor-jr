@@ -26,7 +26,7 @@ class MedicoController
         }
 
         $pdo = Connection::get();
-        $stmt = $pdo->prepare("INSERT INTO tb_medicos (id, nome, CRM, UFCRM) VALUES (?, ?, ?, ?");
+        $stmt = $pdo->prepare("INSERT INTO tb_medicos (id, nome, CRM, UFCRM) VALUES (?, ?, ?, ?)");
 
         $medicoRegistrado = [
             "id" => $id,
