@@ -1,5 +1,5 @@
 import express from "express";
-import pacientes_routes from "./routes/pacientes_routes";
+import pacientes_routes from "./routes/pacientes_routes.js";
 
 const app = express();
 const port = 3000;
