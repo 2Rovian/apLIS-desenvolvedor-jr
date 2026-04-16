@@ -11,6 +11,17 @@ export async function getPacientes(req, res) {
 
 }
 
+export async function getPacienteById(req, res) {
+    try {
+        const { id } = req.params;
+        const [row] = await db.query("SELECT * FROM tb_pacientes WHERE id = ?", id);
+        return res.json(row);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Erro ao listar pacientes" });
+    }
+}
+
 export async function registerPaciente(req, res) {
     try {
         const { id, nome, dataNascimento, carteirinha, cpf } = req.body;
