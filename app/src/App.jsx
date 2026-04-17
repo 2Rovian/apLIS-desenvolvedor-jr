@@ -1,6 +1,7 @@
 import SidebarComp from "./components/SidebarComp";
 import MedicosTableComp from "./components/MedicosTableComp";
 import { useState } from "react";
+import PacientesTableComp from "./components/PacientesTableComp";
 
 function App() {
   const [view, setView] = useState("medicos");
@@ -24,6 +25,7 @@ function App() {
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Pacientes</h1>
               <p className="text-slate-500">Cadastro e listagem de pacientes.</p>
+              <PacientesTableComp />
             </div>
           )}
         </main>
