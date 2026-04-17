@@ -1,38 +1,28 @@
+export default function SidebarComp({ setView, view }) {
+    return (
+        <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 p-4">
 
+            <div className="flex flex-row md:flex-col gap-2">
+                <button
+                    className={`w-full cursor-pointer text-left px-4 py-2 rounded-md font-medium transition ${view === "medicos"
+                        ? "bg-blue-600 text-white"
+                        : "text-slate-700 hover:bg-slate-200"
+                        }`}
+                    onClick={() => setView("medicos")}
+                >
+                    Médicos
+                </button>
 
-export default function SidebarComp({isMenuOpen, handleCloseMenu, handleOpenMenu, setView}) {
-
-    if(!isMenuOpen) {
-        return(
-            <button className="border-2 border-l-none border-t-none text-blue-200 border-blue-200 bg-blue-950 rounded-sm py-1 px-6 mb-2 cursor-pointer size-fit"
-            onClick={handleOpenMenu}
-            >
-                Abrir Menu
-            </button>
-        )
-    }
-
-    return(
-        <aside className="border-r-2 border-b-2 rounded-br-md bg-blue-950 border-blue-950 p-4 h-full fixed z-50">
-            <button className="border-2 text-blue-200 border-blue-200 rounded-sm py-1 px-6 mb-2 cursor-pointer"
-            onClick={handleCloseMenu}
-            >
-                Fechar Menu
-            </button>
-            <div className="flex flex-col gap-y-2">
-                <button className="primary-btn"
-                onClick={() => {
-                    setView("medicos");
-                    handleCloseMenu();
-                }}
-                >Médicos</button>
-                <button className="primary-btn"
-                onClick={() => {
-                    setView("pacientes");
-                    handleCloseMenu();
-                }}
-                >Pacientes</button>
+                <button
+                    className={`w-full cursor-pointer text-left px-4 py-2 rounded-md font-medium transition ${view === "pacientes"
+                        ? "bg-blue-600 text-white"
+                        : "text-slate-700 hover:bg-slate-200"
+                        }`}
+                    onClick={() => setView("pacientes")}
+                >
+                    Pacientes
+                </button>
             </div>
         </aside>
-    )
+    );
 }
