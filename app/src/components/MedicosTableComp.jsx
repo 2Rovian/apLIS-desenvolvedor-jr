@@ -1,8 +1,19 @@
 import { useEffect, useState } from "react";
+import ModalComp from "./ModalComp";
 
 export default function MedicosTableComp() {
     const [medicos, setMedicos] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingMedico, setEditingMedico] = useState(null);
+
+    const [form, setForm] = useState({
+        id: "",
+        nome: "",
+        CRM: "",
+        UFCRM: "",
+    });
 
     async function fetchMedicos() {
         try {
@@ -20,6 +31,86 @@ export default function MedicosTableComp() {
         }
     }
 
+    function handleChange(e) {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value
+        });
+    }
+
+    function openCreateModal() {
+        setEditingMedico(null);
+
+        setForm({
+            id: "",
+            nome: "",
+            CRM: "",
+            UFCRM: "",
+        });
+
+        setIsModalOpen(true);
+    }
+
+    function handleEdit(m) {
+        setEditingMedico(m);
+
+        setForm({
+            id: m.id,
+            nome: m.nome,
+            CRM: m.CRM,
+            UFCRM: m.UFCRM,
+        });
+
+        setIsModalOpen(true);
+    }
+
+    async function handleSubmit() {
+        try {
+
+
+            const method = editingMedico ? "PUT" : "POST";
+
+            const url = "http://localhost:8080/api/v1/medicos";
+
+            await fetch(url, {
+                method, // PUT ou POST
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(form), 
+            });
+
+            setIsModalOpen(false);
+
+            setForm({
+                id: "",
+                nome: "",
+                CRM: "",
+                UFCRM: "",
+            });
+
+            setEditingMedico(null);
+            fetchMedicos();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    async function handleDelete(id) {
+        if (!confirm("Deseja excluir?")) return;
+        try {
+            await fetch(`http://localhost:8080/api/v1/medicos`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ id: id })
+            });
+
+            fetchMedicos(); 
+        } catch (err) {
+            console.error("Erro ao deletar:", err);
+        }
+    }
+
     useEffect(() => {
         fetchMedicos();
     }, []);
@@ -34,7 +125,7 @@ export default function MedicosTableComp() {
                 <h2 className="font-semibold text-slate-800">Lista de Médicos</h2>
 
                 <button
-                    onClick={fetchMedicos}
+                    onClick={openCreateModal}
                     className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
                 >
                     Cadastrar
@@ -56,7 +147,7 @@ export default function MedicosTableComp() {
                     <tbody>
                         {medicos.length === 0 ? (
                             <tr>
-                                <td colSpan={4} className="p-4 text-center text-slate-500">
+                                <td colSpan={5} className="p-4 text-center text-slate-500">
                                     Nenhum médico encontrado
                                 </td>
                             </tr>
@@ -90,10 +181,59 @@ export default function MedicosTableComp() {
                                 </tr>
                             ))
                         )}
-
                     </tbody>
                 </table>
             </div>
+
+            {isModalOpen && (
+                <ModalComp
+                    title={editingMedico ? "Editar Médico" : "Cadastrar Médico"}
+                    onClose={() => setIsModalOpen(false)}
+                >
+                    <div className="flex flex-col gap-3">
+
+                        <input
+                            name="id"
+                            placeholder="Id"
+                            value={form.id}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            name="nome"
+                            placeholder="Nome"
+                            value={form.nome}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            name="CRM"
+                            placeholder="CRM"
+                            value={form.CRM}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            name="UFCRM"
+                            placeholder="UFCRM"
+                            value={form.UFCRM}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <button
+                            onClick={handleSubmit}
+                            className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+                </ModalComp>
+            )}
+
         </div>
     );
 }
