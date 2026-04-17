@@ -1,8 +1,20 @@
 import { useEffect, useState } from "react";
+import ModalComp from "./ModalComp";
 
 export default function PacientesTableComp() {
     const [pacientes, setPacientes] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingPaciente, setEditingPaciente] = useState(null);
+
+    const [form, setForm] = useState({
+        id: "",
+        nome: "",
+        dataNascimento: "",
+        carteirinha: "",
+        cpf: "",
+    });
 
     async function fetchPacientes() {
         try {
@@ -10,7 +22,8 @@ export default function PacientesTableComp() {
 
             const res = await fetch("http://localhost:3000/api/v1/pacientes");
             const json = await res.json();
-            setPacientes(json);
+
+            setPacientes(json.data || json || []);
         } catch (err) {
             console.error(err);
             setPacientes([]);
@@ -19,17 +32,82 @@ export default function PacientesTableComp() {
         }
     }
 
-    function handleEdit(paciente) {
-        console.log("Editar paciente:", paciente);
+    function handleChange(e) {
+        setForm({
+            ...form,
+            [e.target.name]: e.target.value,
+        });
+    }
+
+    function openCreateModal() {
+        setEditingPaciente(null);
+
+        setForm({
+            id: "",
+            nome: "",
+            dataNascimento: "",
+            carteirinha: "",
+            cpf: "",
+        });
+
+        setIsModalOpen(true);
+    }
+
+    function handleEdit(p) {
+        setEditingPaciente(p);
+
+        setForm({
+            id: p.id,
+            nome: p.nome,
+            dataNascimento: p.dataNascimento
+                ? p.dataNascimento.split("T")[0]
+                : "",
+            carteirinha: p.carteirinha,
+            cpf: p.cpf,
+        });
+
+        setIsModalOpen(true);
+    }
+
+    async function handleSubmit() {
+        try {
+            const method = editingPaciente ? "PUT" : "POST";
+
+            const url = editingPaciente
+                ? `http://localhost:3000/api/v1/pacientes/${editingPaciente.id}`
+                : "http://localhost:3000/api/v1/pacientes";
+
+            await fetch(url, {
+                method,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(form),
+            });
+
+            setIsModalOpen(false);
+            setEditingPaciente(null);
+
+            setForm({
+                id: "",
+                nome: "",
+                dataNascimento: "",
+                carteirinha: "",
+                cpf: "",
+            });
+
+            fetchPacientes();
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     async function handleDelete(id) {
+        if (!confirm("Deseja excluir este paciente?")) return;
 
         try {
-            await fetch("http://localhost:3000/api/v1/pacientes", {
+            await fetch(`http://localhost:3000/api/v1/pacientes/${id}`, {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id }),
             });
 
             fetchPacientes();
@@ -48,20 +126,22 @@ export default function PacientesTableComp() {
 
     return (
         <div className="mt-6 bg-white border-slate-300 border rounded-md shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-slate-200 flex justify-between items-center">
+            {/* header */}
+            <div className="p-4 border-b border-slate-300 flex justify-between items-center">
                 <h2 className="font-semibold text-slate-800">Lista de Pacientes</h2>
 
                 <button
-                    onClick={fetchPacientes}
+                    onClick={openCreateModal}
                     className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
                 >
                     Cadastrar
                 </button>
             </div>
 
+            {/* table */}
             <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                    <thead className="bg-slate-100 text-slate-700">
+                    <thead className="bg-slate-100 text-slate-700 ">
                         <tr>
                             <th className="p-3 border-b border-slate-300">ID</th>
                             <th className="p-3 border-b border-slate-300">Nome</th>
@@ -81,13 +161,14 @@ export default function PacientesTableComp() {
                             </tr>
                         ) : (
                             pacientes.map((p) => (
-                                <tr
-                                    key={p.id}
-                                    className="hover:bg-slate-50 transition border-b border-slate-300"
-                                >
+                                <tr key={p.id} className="hover:bg-slate-50 transition border-b border-slate-300">
                                     <td className="p-3">{p.id}</td>
                                     <td className="p-3">{p.nome}</td>
-                                    <td className="p-3">{p.dataNascimento.split("T")[0] || "-"}</td>
+                                    <td className="p-3">
+                                        {p.dataNascimento
+                                            ? p.dataNascimento.split("T")[0]
+                                            : "-"}
+                                    </td>
                                     <td className="p-3">{p.carteirinha}</td>
                                     <td className="p-3">{p.cpf}</td>
 
@@ -114,6 +195,63 @@ export default function PacientesTableComp() {
                     </tbody>
                 </table>
             </div>
+
+            {isModalOpen && (
+                <ModalComp
+                    title={editingPaciente ? "Editar Paciente" : "Cadastrar Paciente"}
+                    onClose={() => setIsModalOpen(false)}
+                >
+                    <div className="flex flex-col gap-3">
+
+                        <input
+                            name="id"
+                            placeholder="Id"
+                            value={form.id}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            name="nome"
+                            placeholder="Nome"
+                            value={form.nome}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            type="date"
+                            name="dataNascimento"
+                            value={form.dataNascimento}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            name="carteirinha"
+                            placeholder="Carteirinha"
+                            value={form.carteirinha}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <input
+                            name="cpf"
+                            placeholder="CPF"
+                            value={form.cpf}
+                            onChange={handleChange}
+                            className="border p-2 rounded"
+                        />
+
+                        <button
+                            onClick={handleSubmit}
+                            className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+                </ModalComp>
+            )}
         </div>
     );
 }
