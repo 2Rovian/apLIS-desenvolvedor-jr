@@ -1,98 +1,89 @@
-# Comunicação
+# 🏥 apLIS - Fullstack Challenge
 
-Toda a comunicação a respeito deste teste deve ser feita através do email thiago.barros@prestadores.aplis.inf.br. 
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://www.php.net/)
+[![MySQL](https://img.shields.io/badge/MySQL-00000F?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-# Entrega
+Este repositório contém a implementação do teste prático para **Desenvolvedor Júnior**. O projeto consiste em um sistema de cadastro e listagem de pacientes e médicos com arquitetura de micro-serviços, integrando diferentes tecnologias de backend para finalidades específicas.
 
-- O prazo para entrega do teste é de 10 dias após seu envio ao candidato.
-- O teste pode ser entregue parcialmente, porém a porcentagem de aderencia ao escopo total será avaliada.
+---
 
-# Recomendações
+## 📸 Preview
 
-- Recomendamos uso de arquitetura MVC em ambos os backends.
-- Recomendamos que o pull request tem a menor quantidade possível de arquivos para cumprir o desafio.
+### Gestão de Médicos (Backend PHP)
+<img width="100%" alt="Tela Médicos" src="https://github.com/user-attachments/assets/47cffaf1-2c0a-4d14-a9fc-2cd07911946f" />
 
-## Teste Prático — Desenvolvedor Junior
+### Gestão de Pacientes (Backend NodeJS)
+<img width="100%" alt="Tela Pacientes" src="https://github.com/user-attachments/assets/dbe6fb86-44e7-47ed-8281-8bd6b0af68bc" />
 
-- Para iniciar crie um fork deste repositório para seu perfil.
-- Para entregar crie uma solicitação pull request.
+---
 
-O teste consiste no desenvolvimento de uma aplicação fullstack simples, composta por um frontend em React (SPA), dois backends independentes e um banco de dados MySQL compartilhado.
+## 🛠 Estrutura do Ecossistema
 
-O backend em PHP será responsável pelo cadastro e listagem de médicos, enquanto o backend em Node.js será responsável pelo cadastro e listagem de pacientes. Cada backend deve expor endpoints REST para criação e consulta de seus respectivos dados, garantindo que as respostas estejam em formato JSON consistente.
+O projeto utiliza uma estratégia de **Monorepo**, facilitando a orquestração via Docker:
 
-O primeiro backend deverá ser desenvolvido em PHP e contemplar as seguintes rotas:
-- `GET /api/v1/medicos`: obtém todos os médicos retornando conforme exemplo abaixo: 
+* **/app**: Frontend moderno construído com React, Vite e TailwindCSS.
+* **/backendjs**: API REST em Node.js (Express) responsável pelo módulo de **Pacientes**.
+* **/backendphp**: API REST em PHP Vanilla (PDO) responsável pelo módulo de **Médicos**.
+* **init.sql**: Schema do banco de dados para provisionamento automático do MySQL.
 
-```json
-    [
-        {
-            "id": 1,
-            "nome": "João da Silva",
-            "CRM": "123456",
-            "UFCRM": "CE"
-        },
-        {
-            "id": 2,
-            "nome": "Francisco Pereira",
-            "CRM": "876543",
-            "UFCRM": "CE"
-        }
-    ]
+---
+
+## 🔌 API Endpoints
+
+### 🩺 Módulo: Médicos (PHP)
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/medicos` | Lista todos os registros |
+| `POST` | `/api/v1/medicos` | Cadastra um novo médico |
+| `PUT` | `/api/v1/medicos` | Atualiza dados (JSON body) |
+| `DELETE` | `/api/v1/medicos` | Remove médico (JSON body c/ ID) |
+
+### 👤 Módulo: Pacientes (Node.js)
+| Método | Endpoint | Descrição |
+| :--- | :--- | :--- |
+| `GET` | `/api/v1/pacientes` | Lista todos os registros |
+| `GET` | `/api/v1/pacientes/:id` | Busca detalhada por ID |
+| `POST` | `/api/v1/pacientes` | Cadastra um novo paciente |
+| `PUT` | `/api/v1/pacientes/:id` | Atualiza dados via URL param |
+| `DELETE` | `/api/v1/pacientes/:id` | Remove paciente por ID |
+
+---
+
+## 🚀 Como Rodar o Projeto
+
+### Pré-requisitos
+Certifique-se de ter instalado:
+* [Docker](https://www.docker.com/)
+* [Docker Compose](https://docs.docker.com/compose/)
+
+### Instalação e Execução
+1. Clone e entre no repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/apLIS-desenvolvedor-jr.git && cd apLIS-desenvolvedor-jr
+    ```
+2.  Suba os containers:
+    ```bash
+    docker compose up --build
+    ```
+3. Acesse as aplicações:
+    - Frontend (React): http://localhost:5173
+    - API Node.js (Pacientes): http://localhost:3000
+    - API PHP (Médicos): http://localhost:8080
+      
+### 🔌 Portas e Serviços
+| Serviço	| Porta | 	
+| :--- | :--- |
+| Frontend (React + Vite) |	5173|	
+| Backend Node.js |	3000 |
+| Backend PHP |	8080 |
+| MySQL Database | 3307 |	
+
+### 🛑 Encerrando
+
+Para encerrar todos os serviços e remover os containers, utilize:
+```bash
+docker compose down
 ```
-
-- `POST /api/v1/medicos`: cria um novo médico enviando o body do exemplo abaixo e retornando a mensagem "Médico criado com sucesso".
-
-```json
-    {
-        "id": 1,
-        "nome": "João da Silva",
-        "CRM": "123456",
-        "UFCRM": "CE"
-    }
-```
-
-O segundo backend deverá ser desenvolvido em NodeJS (JavaScript) e contemplar as seguintes rotas:
-- `GET /api/v1/pacientes`: obtém todos os pacientes retornando conforme exemplo abaixo: 
-
-```json
-    [
-        {
-            "id": 1,
-            "nome": "João da Silva",
-            "dataNascimento": "2026-01-01",
-            "carteirinha": "123456",
-            "cpf": "12345678909"
-        },
-        {
-            "id": 2,
-            "nome": "Francisco Pereira",
-            "carteirinha": "876543",
-            "cpf": "12345678901"
-        }
-    ]
-```
-
-- `POST /api/v1/pacientes`: cria um novo paciente enviando o body do exemplo abaixo e retornando a mensagem "Paciente criado com sucesso".
-
-```json
-    {
-        "id": 1,
-        "nome": "João da Silva",
-        "dataNascimento": "2026-01-01",
-        "carteirinha": "123456",
-        "cpf": "12345678909"
-    },
-```
-
-O frontend deve consumir ambas as APIs, permitindo visualizar listas de médicos e pacientes separadamente, além de possibilitar o cadastro de novos registros. O candidato deverá organizar o projeto em três partes (frontend, backend Node e backend PHP), garantir a integração entre as camadas e manter o código legível e funcional.
-
-A tela deve mostrar um menu sidebar à esquerda com duas opções (Médicos e Pacientes), que quando clicado abre a tela de listagem e criação dos registros.
-
-A avaliação considerará principalmente o funcionamento ponta a ponta da aplicação, a correta integração entre os serviços, a organização do código e, como diferencial, boas práticas, tratamento de erros e clareza na documentação. O tempo estimado para conclusão é de 6 a 10 horas.
-
-
-# Desafio extra 
-
-- Crie as demais operações CRUD
-- Deixe o projeto pronto para multi linguagem, tanto no backend quanto no frontend.
