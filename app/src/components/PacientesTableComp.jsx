@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import ModalComp from "./ModalComp";
+import { usePacientes } from "../hooks/usePacientes";
 
 export default function PacientesTableComp() {
-    const [pacientes, setPacientes] = useState([]);
-    const [loading, setLoading] = useState(true);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPaciente, setEditingPaciente] = useState(null);
+
+    const { pacientes, loading, savePaciente, removePaciente } = usePacientes();
 
     const [form, setForm] = useState({
         id: "",
@@ -15,22 +15,6 @@ export default function PacientesTableComp() {
         carteirinha: "",
         cpf: "",
     });
-
-    async function fetchPacientes() {
-        try {
-            setLoading(true);
-
-            const res = await fetch("http://localhost:3000/api/v1/pacientes");
-            const json = await res.json();
-
-            setPacientes(json.data || json || []);
-        } catch (err) {
-            console.error(err);
-            setPacientes([]);
-        } finally {
-            setLoading(false);
-        }
-    }
 
     function handleChange(e) {
         setForm({
@@ -70,55 +54,29 @@ export default function PacientesTableComp() {
     }
 
     async function handleSubmit() {
-        try {
-            const method = editingPaciente ? "PUT" : "POST";
+        await savePaciente(editingPaciente, form);
 
-            const url = editingPaciente
-                ? `http://localhost:3000/api/v1/pacientes/${editingPaciente.id}`
-                : "http://localhost:3000/api/v1/pacientes";
+        setIsModalOpen(false);
+        setEditingPaciente(null);
 
-            await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(form),
-            });
-
-            setIsModalOpen(false);
-            setEditingPaciente(null);
-
-            setForm({
-                id: "",
-                nome: "",
-                dataNascimento: "",
-                carteirinha: "",
-                cpf: "",
-            });
-
-            fetchPacientes();
-        } catch (err) {
-            console.error(err);
-        }
+        setForm({
+            id: "",
+            nome: "",
+            dataNascimento: "",
+            carteirinha: "",
+            cpf: "",
+        });
     }
 
     async function handleDelete(id) {
         if (!confirm("Deseja excluir este paciente?")) return;
 
         try {
-            await fetch(`http://localhost:3000/api/v1/pacientes/${id}`, {
-                method: "DELETE",
-            });
-
-            fetchPacientes();
+            await removePaciente(id);
         } catch (err) {
-            console.error(err);
+            console.error("Erro ao deletar paciente:", err);
         }
     }
-
-    useEffect(() => {
-        fetchPacientes();
-    }, []);
 
     if (loading) {
         return <p className="mt-4 text-slate-500">Carregando pacientes...</p>;
@@ -126,7 +84,6 @@ export default function PacientesTableComp() {
 
     return (
         <div className="mt-6 bg-white border-slate-300 border rounded-md shadow-sm overflow-hidden">
-            {/* header */}
             <div className="p-4 border-b border-slate-300 flex justify-between items-center">
                 <h2 className="font-semibold text-slate-800">Lista de Pacientes</h2>
 
@@ -138,7 +95,6 @@ export default function PacientesTableComp() {
                 </button>
             </div>
 
-            {/* table */}
             <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-slate-100 text-slate-700 ">
