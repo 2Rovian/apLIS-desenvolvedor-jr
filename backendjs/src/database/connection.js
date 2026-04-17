@@ -1,10 +1,10 @@
 import mysql from "mysql2/promise";
 
 export const db = mysql.createPool({
-    host: "localhost",
+    host: "mysql",
     user: "root",
-    password: "password",
-    database: "apiLIS-schema",
+    password: "root",
+    database: "aplis_db",
     waitForConnections: true,
     connectionLimit: 10
 });

@@ -4,9 +4,9 @@ class Connection {
     public static function get(): PDO {
         try {
             $pdo = new PDO(
-                "mysql:host=localhost;dbname=apiLIS-schema;charset=utf8mb4",
+                "mysql:host=mysql;dbname=aplis_db;charset=utf8mb4",
                 "root",
-                "password"
+                "root"
             );
 
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
