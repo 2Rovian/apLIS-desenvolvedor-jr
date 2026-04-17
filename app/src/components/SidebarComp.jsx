@@ -1,6 +1,6 @@
 export default function SidebarComp({ setView, view }) {
     return (
-        <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-200 p-4">
+        <aside className="w-full md:w-64 bg-white border-b md:border-b-0 md:border-r border-slate-300 p-4">
 
             <div className="flex flex-row md:flex-col gap-2">
                 <button
