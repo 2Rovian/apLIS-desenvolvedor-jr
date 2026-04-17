@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import ModalComp from "./ModalComp";
+import { useMedicos } from "../hooks/useMedicos";
 
 export default function MedicosTableComp() {
-    const [medicos, setMedicos] = useState([]);
-    const [loading, setLoading] = useState(true);
-
+    const { medicos, loading, fetchMedicos, removeMedico, saveMedico } = useMedicos();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingMedico, setEditingMedico] = useState(null);
 
@@ -15,22 +14,15 @@ export default function MedicosTableComp() {
         UFCRM: "",
     });
 
-    async function fetchMedicos() {
+    async function handleDelete(id) {
+        if (!confirm("Deseja excluir este médico?")) return;
+
         try {
-            setLoading(true);
-
-            const res = await fetch("http://localhost:8080/api/v1/medicos");
-            const json = await res.json();
-
-            setMedicos(json.data || []);
+            await removeMedico(id);
         } catch (err) {
-            console.error(err);
-            setMedicos([]);
-        } finally {
-            setLoading(false);
+            console.error("Erro ao deletar médico:", err);
         }
     }
-
     function handleChange(e) {
         setForm({
             ...form,
@@ -66,19 +58,10 @@ export default function MedicosTableComp() {
 
     async function handleSubmit() {
         try {
-
-
-            const method = editingMedico ? "PUT" : "POST";
-
-            const url = "http://localhost:8080/api/v1/medicos";
-
-            await fetch(url, {
-                method, // PUT ou POST
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form), 
-            });
+            await saveMedico(editingMedico, form);
 
             setIsModalOpen(false);
+            setEditingMedico(null);
 
             setForm({
                 id: "",
@@ -86,28 +69,8 @@ export default function MedicosTableComp() {
                 CRM: "",
                 UFCRM: "",
             });
-
-            setEditingMedico(null);
-            fetchMedicos();
         } catch (err) {
             console.error(err);
-        }
-    }
-
-    async function handleDelete(id) {
-        if (!confirm("Deseja excluir?")) return;
-        try {
-            await fetch(`http://localhost:8080/api/v1/medicos`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ id: id })
-            });
-
-            fetchMedicos(); 
-        } catch (err) {
-            console.error("Erro ao deletar:", err);
         }
     }
 
